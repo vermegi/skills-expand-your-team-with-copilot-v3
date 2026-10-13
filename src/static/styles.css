@@ -190,6 +190,131 @@ section h3 {
   justify-content: center;
 }
 
+/* Social Sharing Styles */
+.activity-share {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.share-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.share-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.share-btn:focus-visible {
+  outline: 2px solid var(--primary-light);
+  outline-offset: 2px;
+}
+
+.share-btn .tooltip-text {
+  bottom: 130%;
+  font-size: 0.72rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* Platform-specific brand colors on hover */
+.share-btn-copy:hover {
+  background-color: #f0f4f8;
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+
+.share-btn-copy.copied {
+  background-color: var(--success-light);
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.share-btn-whatsapp:hover {
+  background-color: #25d366;
+  color: #ffffff;
+  border-color: #25d366;
+}
+
+.share-btn-twitter:hover {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.share-btn-facebook:hover {
+  background-color: #1877f2;
+  color: #ffffff;
+  border-color: #1877f2;
+}
+
+.share-btn-email:hover {
+  background-color: #ea4335;
+  color: #ffffff;
+  border-color: #ea4335;
+}
+
+.share-btn-native:hover {
+  background-color: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+/* Card highlight animation when opened via direct share link */
+.activity-card.highlight-card {
+  animation: pulse-highlight 2.5s ease-in-out;
+  border-color: var(--primary);
+}
+
+@keyframes pulse-highlight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(26, 35, 126, 0.6);
+  }
+  30% {
+    box-shadow: 0 0 0 8px rgba(26, 35, 126, 0.25);
+  }
+  60% {
+    box-shadow: 0 0 0 4px rgba(26, 35, 126, 0.35);
+  }
+  100% {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
+}
+
 /* Activity Tag */
 .activity-tag {
   position: absolute;

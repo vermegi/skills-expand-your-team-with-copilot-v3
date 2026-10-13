@@ -472,12 +472,88 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.entries(filteredActivities).forEach(([name, details]) => {
       renderActivityCard(name, details);
     });
+
+    // Check if URL has a specific activity to highlight
+    highlightActivityFromUrl();
+  }
+
+  // Helper function to build a shareable link for an activity
+  function getActivityShareUrl(name) {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set("activity", name);
+      return url.toString();
+    } catch (e) {
+      return `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(name)}`;
+    }
+  }
+
+  // Helper function to copy text to clipboard with fallback
+  async function copyTextToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (err) {
+        // Fallback below
+      }
+    }
+
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    textArea.style.top = "0";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textArea);
+      return successful;
+    } catch (err) {
+      document.body.removeChild(textArea);
+      return false;
+    }
+  }
+
+  // Helper function to scroll and highlight an activity linked from URL
+  function highlightActivityFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let targetActivity = urlParams.get("activity");
+    if (!targetActivity && window.location.hash) {
+      targetActivity = decodeURIComponent(
+        window.location.hash.replace(/^#activity-/, "").replace(/^#/, "")
+      );
+    }
+    if (!targetActivity) return;
+
+    const cards = activitiesList.querySelectorAll(".activity-card");
+    for (const card of cards) {
+      const cardName = card.dataset.activityName || "";
+      if (
+        cardName.toLowerCase() === targetActivity.toLowerCase() ||
+        card.id.toLowerCase() === `activity-${targetActivity.toLowerCase()}`
+      ) {
+        setTimeout(() => {
+          card.scrollIntoView({ behavior: "smooth", block: "center" });
+          card.classList.add("highlight-card");
+          setTimeout(() => {
+            card.classList.remove("highlight-card");
+          }, 3500);
+        }, 150);
+        break;
+      }
+    }
   }
 
   // Function to render a single activity card
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
     activityCard.className = "activity-card";
+    activityCard.dataset.activityName = name;
+    activityCard.id = `activity-${encodeURIComponent(name.toLowerCase().replace(/\s+/g, "-"))}`;
 
     // Calculate spots and capacity
     const totalSpots = details.max_participants;
@@ -521,6 +597,73 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
+    // Generate share information
+    const shareUrl = getActivityShareUrl(name);
+    const shareTitle = `Join ${name} at Mergington High School!`;
+    const shareMessage = `Check out "${name}" at Mergington High School! ${details.description} Schedule: ${formattedSchedule}`;
+
+    const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage + " " + shareUrl)}`;
+    const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`;
+    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+    const emailShareUrl = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(shareMessage + "\n\nFind out more and register here:\n" + shareUrl)}`;
+
+    const supportsNativeShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
+
+    const shareHtml = `
+      <div class="activity-share">
+        <span class="share-label">Share:</span>
+        <div class="share-buttons">
+          <button class="share-btn share-btn-copy tooltip" aria-label="Copy link to ${name}">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            <span class="tooltip-text">Copy link</span>
+          </button>
+          <a class="share-btn share-btn-whatsapp tooltip" href="${whatsappShareUrl}" target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+              <path d="M20.52 3.48A11.93 11.93 0 0 0 12.04 0C5.43 0 .07 5.36.07 11.97c0 2.11.55 4.17 1.6 6L0 24l6.2-1.63a11.9 11.9 0 0 0 5.84 1.51h.01c6.61 0 11.97-5.36 11.97-11.97 0-3.2-1.25-6.21-3.48-8.49zm-8.47 18.42c-1.8 0-3.56-.48-5.1-1.4l-.36-.22-3.78 1 .99-3.68-.24-.38a9.94 9.94 0 0 1-1.53-5.25c0-5.5 4.48-9.98 9.99-9.98 2.67 0 5.18 1.04 7.07 2.93a9.92 9.92 0 0 1 2.93 7.05c0 5.5-4.48 9.98-9.97 9.98zm5.47-7.46c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.34.22-.64.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.78-1.67-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.34.45-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.27.49 1.7.63.71.23 1.36.2 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/>
+            </svg>
+            <span class="tooltip-text">Share on WhatsApp</span>
+          </a>
+          <a class="share-btn share-btn-twitter tooltip" href="${twitterShareUrl}" target="_blank" rel="noopener noreferrer" aria-label="Share on X">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+            <span class="tooltip-text">Share on X</span>
+          </a>
+          <a class="share-btn share-btn-facebook tooltip" href="${facebookShareUrl}" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            <span class="tooltip-text">Share on Facebook</span>
+          </a>
+          <a class="share-btn share-btn-email tooltip" href="${emailShareUrl}" aria-label="Share via Email">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+            <span class="tooltip-text">Share via Email</span>
+          </a>
+          ${
+            supportsNativeShare
+              ? `
+          <button class="share-btn share-btn-native tooltip" aria-label="More share options for ${name}">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+            <span class="tooltip-text">More options</span>
+          </button>
+          `
+              : ""
+          }
+        </div>
+      </div>
+    `;
+
     activityCard.innerHTML = `
       ${tagHtml}
       <h4>${name}</h4>
@@ -554,6 +697,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("")}
         </ul>
       </div>
+      ${shareHtml}
       <div class="activity-card-actions">
         ${
           currentUser
@@ -587,6 +731,42 @@ document.addEventListener("DOMContentLoaded", () => {
           openRegistrationModal(name);
         });
       }
+    }
+
+    // Add click handler for copy link button
+    const copyButton = activityCard.querySelector(".share-btn-copy");
+    if (copyButton) {
+      copyButton.addEventListener("click", async () => {
+        const success = await copyTextToClipboard(shareUrl);
+        const tooltip = copyButton.querySelector(".tooltip-text");
+        const originalText = tooltip ? tooltip.textContent : "Copy link";
+        if (success) {
+          copyButton.classList.add("copied");
+          if (tooltip) tooltip.textContent = "Link copied!";
+          setTimeout(() => {
+            copyButton.classList.remove("copied");
+            if (tooltip) tooltip.textContent = originalText;
+          }, 2000);
+        }
+      });
+    }
+
+    // Add click handler for native share button (if supported)
+    const nativeShareButton = activityCard.querySelector(".share-btn-native");
+    if (nativeShareButton && supportsNativeShare) {
+      nativeShareButton.addEventListener("click", async () => {
+        try {
+          await navigator.share({
+            title: shareTitle,
+            text: shareMessage,
+            url: shareUrl,
+          });
+        } catch (err) {
+          if (err.name !== "AbortError") {
+            console.error("Error sharing:", err);
+          }
+        }
+      });
     }
 
     activitiesList.appendChild(activityCard);
