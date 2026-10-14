@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll(".view-toggle").forEach((toggle) => {
         toggle.setAttribute("aria-pressed", toggle.dataset.view === currentView);
       });
-      displayFilteredActivities();
+      fetchActivities();
     });
   });
 
@@ -406,7 +406,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let queryParams = [];
 
       // Handle day filter
-      if (currentDay) {
+      if (currentDay && currentView !== "calendar") {
         queryParams.push(`day=${encodeURIComponent(currentDay)}`);
       }
 
@@ -460,7 +460,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Apply weekend filter if selected
-      if (currentTimeRange === "weekend" && details.schedule_details) {
+      if (
+        currentTimeRange === "weekend" &&
+        currentView !== "calendar" &&
+        details.schedule_details
+      ) {
         const activityDays = details.schedule_details.days;
         const isWeekendActivity = activityDays.some((day) =>
           timeRanges.weekend.days.includes(day)
