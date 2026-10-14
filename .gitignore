@@ -1,0 +1,9 @@
+.target-app/
+.venv/
+node_modules/
+__pycache__/
+.pytest_cache/
+.coverage
+coverage.xml
+test-results.xml
+frontend-test-results.xml
