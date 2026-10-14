@@ -1,0 +1,18 @@
+winget install --id GitHub.cli
+
+gh --version
+
+# gh auth login
+
+gh extension install github/gh-aw
+
+cd .github\workflows
+
+gh aw compile
+
+cd ../..
+
+git add .
+git commit -m "Add daily issues report workflow"
+
+git push
