@@ -60,6 +60,17 @@ document.addEventListener("DOMContentLoaded", () => {
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
+  let currentView = "cards";
+
+  document.querySelectorAll(".view-toggle").forEach((button) => {
+    button.addEventListener("click", () => {
+      currentView = button.dataset.view;
+      document.querySelectorAll(".view-toggle").forEach((toggle) => {
+        toggle.setAttribute("aria-pressed", toggle.dataset.view === currentView);
+      });
+      displayFilteredActivities();
+    });
+  });
 
   // Authentication state
   let currentUser = null;
@@ -435,6 +446,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function displayFilteredActivities() {
     // Clear the activities list
     activitiesList.innerHTML = "";
+    activitiesList.classList.toggle("calendar-view", currentView === "calendar");
 
     // Apply client-side filtering - this handles category filter and search, plus weekend filter
     let filteredActivities = {};
@@ -485,6 +497,14 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>Try adjusting your search or filter criteria</p>
         </div>
       `;
+      return;
+    }
+
+    if (currentView === "calendar") {
+      renderActivityCalendar(activitiesList, filteredActivities, formatSchedule, {
+        day: currentDay,
+        weekend: currentTimeRange === "weekend",
+      });
       return;
     }
 

@@ -135,6 +135,102 @@ section h3 {
 
 .activities-content {
   flex: 1;
+  min-width: 0;
+}
+
+.view-controls {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.view-toggle {
+  background-color: transparent;
+  border: 1px solid var(--primary-text);
+}
+
+.view-toggle[aria-pressed="true"] {
+  background-color: var(--primary-text);
+  color: var(--primary);
+}
+
+#activities-list.calendar-view {
+  display: block;
+  overflow-x: auto;
+  padding-bottom: 16px;
+}
+
+.weekly-calendar {
+  display: grid;
+  grid-template-columns: 65px repeat(7, minmax(120px, 1fr));
+  padding-top: 8px;
+  padding-bottom: 12px;
+}
+
+.calendar-heading {
+  padding: 8px 4px;
+  text-align: center;
+  font-weight: bold;
+  color: var(--heading-color);
+  border-bottom: 1px solid var(--border);
+}
+
+.calendar-time-axis,
+.calendar-day {
+  position: relative;
+}
+
+.calendar-time-label {
+  position: absolute;
+  right: 6px;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.calendar-day {
+  border-left: 1px solid var(--border);
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--border) 0,
+    var(--border) 1px,
+    transparent 1px,
+    transparent 90px
+  );
+}
+
+.calendar-event {
+  position: absolute;
+  padding: 4px;
+  border: 1px solid var(--surface);
+  border-radius: 4px;
+  background-color: var(--primary);
+  color: var(--primary-text);
+  overflow: hidden;
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.calendar-event strong,
+.calendar-event span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.calendar-event:hover,
+.calendar-event:focus {
+  background-color: var(--primary-light);
+  outline: 2px solid var(--secondary);
+  z-index: 1;
+}
+
+@media (max-width: 1000px) {
+  #user-controls {
+    position: static;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 10px;
+  }
 }
 
 /* Desktop layout */
