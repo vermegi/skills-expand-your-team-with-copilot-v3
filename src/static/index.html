@@ -7,9 +7,30 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <svg class="branch-background" aria-hidden="true" focusable="false" viewBox="0 0 1440 900" preserveAspectRatio="none">
+      <path class="branch-line" d="M-40 720 H220 V600 H390 V740 H560 V500 H760 V650 H920 V420 H1120 V560 H1480" />
+      <path class="branch-line" d="M220 600 V360 H440 V240 H640 V360 H820 V180 H1040 V300 H1240 V120 H1480" />
+      <path class="branch-line" d="M560 500 V820 H740 V760 H980 V860 H1180 V700 H1480" />
+      <circle cx="220" cy="600" r="5" />
+      <circle cx="440" cy="240" r="5" />
+      <circle cx="760" cy="500" r="5" />
+      <circle cx="1040" cy="300" r="5" />
+      <circle cx="1180" cy="700" r="5" />
+    </svg>
     <header>
       <h1>Mergington High School</h1>
       <h2>Extracurricular Activities</h2>
+      <nav class="mascot-gallery" aria-label="Octodex mascots">
+        <a href="https://octodex.github.com/" target="_blank" rel="noopener noreferrer">
+          <img src="https://octodex.github.com/images/original.png" alt="The original Octocat" />
+        </a>
+        <a href="https://octodex.github.com/" target="_blank" rel="noopener noreferrer">
+          <img src="https://octodex.github.com/images/daftpunktocat-thomas.gif" alt="Daft Punktocat" />
+        </a>
+        <a href="https://octodex.github.com/" target="_blank" rel="noopener noreferrer">
+          <img src="https://octodex.github.com/images/nyantocat.gif" alt="Nyan Cat Octocat" />
+        </a>
+      </nav>
       <div id="user-controls">
         <button
           id="theme-toggle"
@@ -123,6 +144,7 @@
 
     <footer>
       <p>&copy; 2023 Mergington High School</p>
+      <p>Mascots from <a href="https://octodex.github.com/" target="_blank" rel="noopener noreferrer">GitHub Octodex</a>.</p>
     </footer>
 
     <!-- Registration Modal -->

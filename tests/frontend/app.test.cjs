@@ -6,6 +6,7 @@ const { JSDOM } = require("jsdom");
 
 const root = resolve(process.env.TARGET_SOURCE_ROOT || ".");
 const html = readFileSync(join(root, "src", "static", "index.html"), "utf8");
+const styles = readFileSync(join(root, "src", "static", "styles.css"), "utf8");
 const script = readFileSync(join(root, "src", "static", "app.js"), "utf8");
 const teacher = {
   username: "test-teacher",
@@ -62,6 +63,22 @@ async function setup(t, { data = activities, storage = {}, respond } = {}) {
     errors,
   };
 }
+
+test("school colors, Octodex mascots and animated branches are present", () => {
+  const dom = new JSDOM(html);
+  const { document } = dom.window;
+  const mascots = document.querySelectorAll(".mascot-gallery img");
+
+  assert.match(styles, /--primary:\s*#4d7c0f/i);
+  assert.match(styles, /--secondary:\s*#84cc16/i);
+  assert.match(styles, /--background:\s*#ffffff/i);
+  assert.equal(mascots.length, 3);
+  assert.ok(Array.from(mascots).every((image) => image.alt && image.src.includes("octodex.github.com/images/")));
+  assert.equal(document.querySelectorAll(".branch-background .branch-line").length, 3);
+  assert.match(styles, /animation:\s*branch-flow/);
+  assert.match(styles, /prefers-reduced-motion:\s*reduce/);
+  dom.window.close();
+});
 
 function names(document) {
   return Array.from(document.querySelectorAll(".activity-card h4"), (node) => node.textContent);
