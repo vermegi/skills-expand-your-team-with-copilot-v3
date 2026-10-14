@@ -10,6 +10,10 @@
     <header>
       <h1>Mergington High School</h1>
       <h2>Extracurricular Activities</h2>
+      <div id="view-controls" role="group" aria-label="Activity view">
+        <button type="button" data-view="cards" aria-pressed="true">Cards</button>
+        <button type="button" data-view="calendar" aria-pressed="false">Calendar</button>
+      </div>
       <div id="user-controls">
         <button
           id="theme-toggle"
@@ -176,6 +180,7 @@
       </div>
     </div>
 
+    <script src="calendar.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

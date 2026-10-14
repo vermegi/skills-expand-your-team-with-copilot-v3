@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   // DOM elements
   const activitiesList = document.getElementById("activities-list");
+  const viewButtons = document.querySelectorAll("[data-view]");
   const messageDiv = document.getElementById("message");
   const registrationModal = document.getElementById("registration-modal");
   const modalActivityName = document.getElementById("modal-activity-name");
@@ -60,6 +61,17 @@ document.addEventListener("DOMContentLoaded", () => {
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
+  let currentView = "cards";
+
+  viewButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      currentView = button.dataset.view;
+      viewButtons.forEach((viewButton) => {
+        viewButton.setAttribute("aria-pressed", viewButton === button);
+      });
+      displayFilteredActivities();
+    });
+  });
 
   // Authentication state
   let currentUser = null;
@@ -276,6 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Show loading skeletons
   function showLoadingSkeletons() {
+    activitiesList.classList.remove("calendar-view");
     activitiesList.innerHTML = "";
 
     // Create more skeleton cards to fill the screen since they're smaller now
@@ -435,6 +448,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function displayFilteredActivities() {
     // Clear the activities list
     activitiesList.innerHTML = "";
+    activitiesList.classList.toggle("calendar-view", currentView === "calendar");
 
     // Apply client-side filtering - this handles category filter and search, plus weekend filter
     let filteredActivities = {};
@@ -485,6 +499,15 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>Try adjusting your search or filter criteria</p>
         </div>
       `;
+      return;
+    }
+
+    if (currentView === "calendar") {
+      renderWeeklyCalendar(activitiesList, filteredActivities, {
+        day: currentDay,
+        weekendOnly: currentTimeRange === "weekend",
+        formatSchedule,
+      });
       return;
     }
 
