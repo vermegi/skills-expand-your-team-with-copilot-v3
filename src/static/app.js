@@ -60,6 +60,17 @@ document.addEventListener("DOMContentLoaded", () => {
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
+  let currentView = "cards";
+
+  document.querySelectorAll(".view-toggle").forEach((button) => {
+    button.addEventListener("click", () => {
+      currentView = button.dataset.view;
+      document.querySelectorAll(".view-toggle").forEach((toggle) => {
+        toggle.setAttribute("aria-pressed", toggle.dataset.view === currentView);
+      });
+      fetchActivities();
+    });
+  });
 
   // Authentication state
   let currentUser = null;
@@ -395,7 +406,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let queryParams = [];
 
       // Handle day filter
-      if (currentDay) {
+      if (currentDay && currentView !== "calendar") {
         queryParams.push(`day=${encodeURIComponent(currentDay)}`);
       }
 
@@ -435,6 +446,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function displayFilteredActivities() {
     // Clear the activities list
     activitiesList.innerHTML = "";
+    activitiesList.classList.toggle("calendar-view", currentView === "calendar");
 
     // Apply client-side filtering - this handles category filter and search, plus weekend filter
     let filteredActivities = {};
@@ -448,7 +460,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Apply weekend filter if selected
-      if (currentTimeRange === "weekend" && details.schedule_details) {
+      if (
+        currentTimeRange === "weekend" &&
+        currentView !== "calendar" &&
+        details.schedule_details
+      ) {
         const activityDays = details.schedule_details.days;
         const isWeekendActivity = activityDays.some((day) =>
           timeRanges.weekend.days.includes(day)
@@ -485,6 +501,14 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>Try adjusting your search or filter criteria</p>
         </div>
       `;
+      return;
+    }
+
+    if (currentView === "calendar") {
+      renderActivityCalendar(activitiesList, filteredActivities, formatSchedule, {
+        day: currentDay,
+        weekend: currentTimeRange === "weekend",
+      });
       return;
     }
 
